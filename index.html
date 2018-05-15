@@ -1,0 +1,230 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+
+    <title>reveal.js</title>
+
+    <link rel="stylesheet" href="css/reveal.css">
+    <link rel="stylesheet" href="css/theme/black.css">
+
+    <!-- Theme used for syntax highlighting of code -->
+    <link rel="stylesheet" href="lib/css/zenburn.css">
+
+    <!-- Printing and PDF exports -->
+    <script>
+      var link = document.createElement( 'link' );
+      link.rel = 'stylesheet';
+      link.type = 'text/css';
+      link.href = window.location.search.match( /print-pdf/gi ) ? 'css/print/pdf.css' : 'css/print/paper.css';
+      document.getElementsByTagName( 'head' )[0].appendChild( link );
+    </script>
+  </head>
+  <body>
+    <div class="reveal">
+      <div class="slides">
+
+        <section data-markdown>
+          <textarea data-template>
+            План обсуждения.
+
+            1. Инициализация атрибутов в distapcth.
+            2. Предупреждение no-self-use.
+            3. docstrings для стандартных методов django.
+            4. Количество базовых классов.
+            5. Двухуровневое абстрактное наследование.
+            6. Примеси (Mixins).
+            7. Документация параметров args, kwargs.
+          </textarea>
+        </section>
+
+        <section data-markdown>
+          <textarea data-template>
+            Инициализация атрибутов в distapcth.
+            <!-- .element style="font-size:70px" -->
+
+            Инициализация атрибутов в `__init__, setUp`
+
+            Предложение: добавить в этот список `dispatch`
+
+          </textarea>
+        </section>
+
+        <section data-markdown>
+          <textarea data-template>
+            Предупреждение `no-self-use`.
+            <!-- .element style="font-size:70px" -->
+
+            `Method could be a function (no-self-use)`
+            <!-- .element style="font-size:30px" -->
+
+            ```python
+            class MyBaseClass(object):
+                def get_X(self):
+                    return None
+            ```
+
+            ```python
+            class MyBaseClass(object):
+                @staticmethod
+                def get_X():
+                    return None 
+            ```
+
+            При переопределении `get_X` может понадобиться `self` => изменится интерфейс метода.
+
+            <!-- .element style="font-size:30px" -->
+
+            **Предложение:** выключить no-self-use.
+
+          </textarea>
+        </section>
+
+
+        <section data-markdown>
+          <textarea data-template>
+            Выключить docstring для.
+            <!-- .element style="font-size:70px" -->
+
+            * `post`
+            * `get`
+            * `media`
+            * `dispatch`
+            * `get_context_data`
+            * `get_form_kwargs`
+            * `get_form`
+            * `form_valid`
+          </textarea>
+        </section>
+
+
+        <section data-markdown>
+          <textarea data-template>
+            Количество базовых классов.
+            <!-- .element style="font-size:70px" -->
+
+            `R0901: too-many-ancestors (N/7)`
+            <!-- .element style="font-size:30px" -->
+
+
+            **Предложение:** установить макс. кол-во = 20
+          </textarea>
+        </section>
+
+
+        <section data-markdown>
+          <textarea data-template>
+            Двухуровневое абстрактное наследование..
+            <!-- .element style="font-size:40px" -->
+
+            `Method 'bar' is abstract in class 'A' but is not overridden (abstract-method)`
+            <!-- .element style="font-size:30px" -->
+
+
+            ```python
+class A(object):
+    __metaclass__ = ABCMeta
+
+    @abstractmethod
+    def foo(self):
+        pass
+
+    @abstractmethod
+    def bar(self):
+        pass
+
+
+class B(A):
+    __metaclass__ = ABCMeta
+
+    def foo(self):
+        return 1
+
+
+class C(B):
+    def bar(self):
+        return 2
+            ```
+          </textarea>
+        </section>
+
+
+        <section data-markdown>
+          <textarea data-template>
+            Примеси (mixins).
+            <!-- .element style="font-size:70px" -->
+
+            `Super of 'MyBaseView' has no 'get_context_data' member (no-member)`
+            <!-- .element style="font-size:30px" -->
+
+            ```python
+class MyBaseView(object):
+    def get_context_data(self, **kwargs):
+        context = super(MyBaseView, self).get_context_data(**kwargs)
+        context['X'] = 1
+        return context
+
+
+class MyView(MyBaseView, TemplateView):
+    pass
+            ```
+
+            **Совет:** переименовать 'MyBaseView' --> 'MyViewMixin'
+
+            <!-- .element style="font-size:30px" -->
+          </textarea>
+        </section>
+
+
+        <section data-markdown>
+          <textarea data-template>
+            Docstrings for args, kwargs.
+            <!-- .element style="font-size:70px" -->
+
+            `"args, kwargs" missing in parameter documentation (missing-param-doc)`
+            <!-- .element style="font-size:30px" -->
+
+
+            ```python
+from django import forms
+
+class MyForm(forms.Form):
+    def __init__(self, myvar, *args, **kwargs):
+        u'''Do something
+                      :param object myvar: description
+        '''
+        self.myvar = myvar
+        super(MyForm, self).__init__(*args, **kwargs)
+            ```
+
+
+          </textarea>
+        </section>
+
+
+      </div>
+    </div>
+
+
+
+
+    <script src="lib/js/head.min.js"></script>
+    <script src="js/reveal.js"></script>
+
+    <script>
+      // More info about config & dependencies:
+      // - https://github.com/hakimel/reveal.js#configuration
+      // - https://github.com/hakimel/reveal.js#dependencies
+      Reveal.initialize({
+        slideNumber: true,
+        dependencies: [
+          { src: 'plugin/markdown/marked.js' },
+          { src: 'plugin/markdown/markdown.js' },
+          { src: 'plugin/notes/notes.js', async: true },
+          { src: 'plugin/highlight/highlight.js', async: true, callback: function() { hljs.initHighlightingOnLoad(); } }
+        ]
+      });
+    </script>
+  </body>
+</html>
